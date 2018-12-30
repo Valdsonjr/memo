@@ -24,11 +24,14 @@ list = [sql|
     WHERE NOT HIDDEN |]
 
 insert :: Query
-insert =
-    [sql| INSERT or IGNORE INTO STORE (KEY, VALUE, HIDDEN) VALUES (?,?,?) |]
+insert = [sql|
+    INSERT or IGNORE INTO STORE (KEY, VALUE, HIDDEN) VALUES (?,?,?) ;
+    SELECT CHANGES() |]
 
 delete :: Query
-delete = [sql| DELETE FROM STORE WHERE KEY = ? |]
+delete = [sql|
+    DELETE FROM STORE WHERE KEY = ? ;
+    SELECT CHANGES() |]
 
 fetch :: Query
 fetch = [sql| SELECT VALUE, HIDDEN FROM STORE WHERE KEY = ? |]

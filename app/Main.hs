@@ -1,9 +1,8 @@
 module Main where
 
 import           Control.Monad                 (unless)
-import           Database.SQLite.Simple        (Connection, Only (..), changes,
-                                                execute, fold_, fromOnly, query,
-                                                withConnection)
+import           Database.SQLite.Simple        (Connection, Only (..), fold_,
+                                                fromOnly, query, withConnection)
 import           Query                         (delete, fetch, insert, list)
 import           System.Clipboard              (setClipboardString)
 import           System.Directory              (doesFileExist)
@@ -63,8 +62,7 @@ get key conn =
 -------------------------------------------------------------------------------
 del :: String -> App
 del key conn = do
-    execute conn delete (Only key)
-    change <- changes conn
+    [[change]] <- query conn delete (Only key) :: IO [[Int]]
     unless (change == 1) (failWith KeyNotFound)
 
 -------------------------------------------------------------------------------
@@ -80,8 +78,7 @@ ls conn = fold_ conn list () (const (putStrLn . fromOnly))
 -------------------------------------------------------------------------------
 put :: Item -> App
 put item conn = do
-    execute conn insert item
-    change <- changes conn
+    [[change]] <- query conn insert item :: IO [[Int]]
     unless (change == 1) (failWith KeyAlreadyExists)
 
 main :: IO ()
